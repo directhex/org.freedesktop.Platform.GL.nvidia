@@ -1,0 +1,5 @@
+.flatpak-builder
+builddir
+dl
+org.freedesktop.Platform.GL.nvidia.json
+repo
