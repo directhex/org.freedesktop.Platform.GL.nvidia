@@ -3,13 +3,10 @@
 source ./versions.sh
 
 set -e
-set -x
 
 for VER in $DRIVER_VERSIONS; do
     for ARCH in x86_64 i386; do
-
         F="data/nvidia-$VER-$ARCH.data"
-        echo $F
         if [ -f $F ]; then continue; fi
 
         if [ $ARCH == x86_64 ]; then
@@ -20,22 +17,23 @@ for VER in $DRIVER_VERSIONS; do
             SUFFIX=
         fi
 
-      rm -f dl
-      URL=http://http.download.nvidia.com/XFree86/Linux-${NVIDIA_ARCH}/${VER}/NVIDIA-Linux-${NVIDIA_ARCH}-${VER}${SUFFIX}.run
+        echo Generating $F
 
-      if ! curl -f -o dl $URL; then
-          URL=http://us.download.nvidia.com/XFree86/Linux-${NVIDIA_ARCH}/${VER}/NVIDIA-Linux-${NVIDIA_ARCH}-${VER}${SUFFIX}.run
-          if ! curl -f -o dl $URL; then
-              echo "Unable to find URL for version $VER, arch $ARCH"
-              exit 1
-          fi
-      fi
-      SHA256=$(sha256sum dl | awk "{print \$1}")
-      SIZE=$(stat -c%s dl) && \
-      rm -f dl
+        rm -f dl
+        URL=http://http.download.nvidia.com/XFree86/Linux-${NVIDIA_ARCH}/${VER}/NVIDIA-Linux-${NVIDIA_ARCH}-${VER}${SUFFIX}.run
 
-      echo :$SHA256:$SIZE::$URL > $F
-      git add $F
+        if ! curl -f -o dl $URL; then
+            URL=http://us.download.nvidia.com/XFree86/Linux-${NVIDIA_ARCH}/${VER}/NVIDIA-Linux-${NVIDIA_ARCH}-${VER}${SUFFIX}.run
+            if ! curl -f -o dl $URL; then
+                echo "Unable to find URL for version $VER, arch $ARCH"
+                exit 1
+            fi
+        fi
+        SHA256=$(sha256sum dl | awk "{print \$1}")
+        SIZE=$(stat -c%s dl)
+        rm -f dl
 
+        echo :$SHA256:$SIZE::$URL > $F
+        git add $F
     done
 done
