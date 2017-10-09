@@ -19,15 +19,17 @@ for VER in $DRIVER_VERSIONS; do
     fi
     NVIDIA_VERSION=$(echo $VER | sed "s/\./-/")
     EXTRA_DATA=$(cat $F)
+    rm -f org.freedesktop.Platform.GL.nvidia-$NVIDIA_VERSION.json
     sed -e "s/@@SDK_BRANCH@@/${SDK_BRANCH}/g"			\
         -e "s/@@SDK_RUNTIME_VERSION@@/${SDK_RUNTIME_VERSION}/g"	\
         -e "s/@@NVIDIA_VERSION@@/${NVIDIA_VERSION}/g"		\
         -e "s=@@EXTRA_DATA@@=${EXTRA_DATA}=g" \
-        org.freedesktop.Platform.GL.nvidia.json.in > org.freedesktop.Platform.GL.nvidia.json
+        org.freedesktop.Platform.GL.nvidia.json.in > org.freedesktop.Platform.GL.nvidia-$NVIDIA_VERSION.json
 
     flatpak-builder -v --force-clean --ccache --sandbox --delete-build-dirs \
                     --user --install-deps-from=flathub \
                     --arch=${ARCH} \
                     --repo=repo --subject="build of, org.freedesktop.Platform.GL.nvidia-$NVIDIA_VERSION `date`" \
-                    ${EXTRA_ARGS} builddir org.freedesktop.Platform.GL.nvidia.json
+                    ${EXTRA_ARGS} builddir org.freedesktop.Platform.GL.nvidia-$NVIDIA_VERSION.json
+    rm org.freedesktop.Platform.GL.nvidia-$NVIDIA_VERSION.json
 done
